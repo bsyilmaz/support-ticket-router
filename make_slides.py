@@ -244,6 +244,7 @@ best_acc = max(core, key=lambda k: M[k]["in_scope_accuracy"])
 best_oos = max(core, key=lambda k: M[k]["oos_recall"])
 fastest = min(core, key=lambda k: M[k]["latency"]["mean_ms"])
 b, f, q = M["baseline"], M["ffnn"], M["quantized"]
+sf, ti = M["student_fp32"], M["teacher_int8"]
 s = new_slide("Conclusion – what the comparison showed", "Conclusion")
 bullets(s, 0.6, 1.35, 12.1, 5.8, [
     f"Highest in-scope accuracy: {M[best_acc]['name']} ({pct(M[best_acc]['in_scope_accuracy'])});"
@@ -252,12 +253,23 @@ bullets(s, 0.6, 1.35, 12.1, 5.8, [
     f"({t['size_mb'] / q['size_mb']:.1f}× smaller), {t['latency']['mean_ms']:.1f} → "
     f"{q['latency']['mean_ms']:.1f} ms ({t['latency']['mean_ms'] / q['latency']['mean_ms']:.1f}× "
     f"faster), in-scope accuracy {pct(t['in_scope_accuracy'])} → {pct(q['in_scope_accuracy'])}.",
-    f"Distillation vs. quantization: student FP32 {pct(M['student_fp32']['in_scope_accuracy'])} → "
-    f"INT8 {pct(q['in_scope_accuracy'])} (quantization cost "
-    f"{100 * (M['student_fp32']['in_scope_accuracy'] - q['in_scope_accuracy']):+.1f} pp).",
-    f"tf-idf baseline is a strong, tiny and fast model ({pct(b['in_scope_accuracy'])}, "
-    f"{b['size_mb']:.1f} MB, {b['latency']['mean_ms']:.1f} ms) — word overlap is very informative "
-    f"in CLINC150; it is weaker on paraphrases and unseen wording.",
+    f"Quantization alone: student FP32 {pct(sf['in_scope_accuracy'])} → INT8 "
+    f"{pct(q['in_scope_accuracy'])} ({100 * (q['in_scope_accuracy'] - sf['in_scope_accuracy']):+.1f} pp), "
+    f"{sf['size_mb']:.0f} → {q['size_mb']:.0f} MB, {sf['latency']['mean_ms']:.1f} → "
+    f"{q['latency']['mean_ms']:.1f} ms"
+    + (" — no speed-up on this small model (embeddings stay FP32, 1 CPU thread)."
+       if q['latency']['mean_ms'] >= sf['latency']['mean_ms'] else "."),
+    f"Quantizing the large teacher without distillation: {pct(t['in_scope_accuracy'])} → "
+    f"{pct(ti['in_scope_accuracy'])} in-scope, {ti['size_mb']:.0f} MB, "
+    f"{ti['latency']['mean_ms']:.1f} ms — distilling first keeps more accuracy at a much lower cost."
+    if ti['in_scope_accuracy'] < q['in_scope_accuracy'] else
+    f"Teacher INT8 (no distillation): {pct(ti['in_scope_accuracy'])} in-scope, "
+    f"{ti['size_mb']:.0f} MB, {ti['latency']['mean_ms']:.1f} ms.",
+    f"tf-idf baseline: {pct(b['in_scope_accuracy'])} in-scope, {pct(b['oos_recall'])} OOS recall, "
+    f"{b['size_mb']:.1f} MB, {b['latency']['mean_ms']:.1f} ms — word overlap is informative in "
+    "CLINC150, but it is weaker on paraphrases and unseen wording"
+    + ("; its 151-class weight matrix over all uni/bigrams is larger than the quantized student."
+       if b['size_mb'] > q['size_mb'] else "."),
     f"word2vec + FFNN ({pct(f['in_scope_accuracy'])}) loses word order and is limited by "
     "embeddings trained on only ~15k short messages.",
     f"Fastest model: {M[fastest]['name']} ({M[fastest]['latency']['mean_ms']:.2f} ms). "
@@ -265,7 +277,7 @@ bullets(s, 0.6, 1.35, 12.1, 5.8, [
        "Models meeting") + " a 50 ms CPU budget"
     + ("." if all(M[k]['latency']['mean_ms'] < 50 for k in core) else
        ": " + ", ".join(M[k]['name'] for k in core if M[k]['latency']['mean_ms'] < 50) + "."),
-], 16)
+], 15)
 
 # ---------------------------------------------------------------- 9 limitations
 s = new_slide("Limitations, failure examples, next steps", "Conclusion")

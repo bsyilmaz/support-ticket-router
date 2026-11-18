@@ -13,7 +13,8 @@ small talk get a **rule-based (ELIZA-style) reply**. The routing decision is mad
 | 4 | `google/bert_uncased_L-4_H-256_A-4` distilled from the teacher, then dynamic INT8 quantization | D – efficient models |
 
 Preprocessing (area B): regex normalization, regex model-code extraction (`DW-6534`),
-minimum-edit-distance spelling correction, ELIZA rules. See `docs/architecture.png`.
+minimum-edit-distance spelling correction, ELIZA rules. The architecture diagram is slide 4 of the
+presentation; `python make_diagram.py` regenerates it as `docs/architecture.png`.
 
 Data: [CLINC150](https://github.com/clinc/oos-eval) "full" split (Larson et al., 2019, CC BY 3.0),
 downloaded automatically into `data/` on first run. All models use the same held-out test set
@@ -21,7 +22,7 @@ downloaded automatically into `data/` on first run. All models use the same held
 
 ## Setup
 
-Python 3.10–3.13.
+Python 3.12 or 3.13 (tested on 3.13; see the tested versions in `requirements.txt`).
 
 ```bash
 git clone https://github.com/bsyilmaz/support-ticket-router.git
