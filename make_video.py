@@ -25,7 +25,7 @@ MESSAGES = [
     (14.0, "my card got declined at the grocery store"),
     (26.5, "plese tranfer 300 dolars to my savngs acount"),
     (35.9, "my dishwasher won't drain, model DW-6534"),
-    (45.0, "hello, how are you?"),
+    (43.9, "hello, how are you?"),
 ]
 DEMO_END = 47.7
 SLIDES = [(4, 58.3), (7, 76.5), (8, None)]   # (slide number, end second); None = until audio ends
@@ -51,6 +51,12 @@ def record():
         t_ctx = time.time()
         page = ctx.new_page()
         page.goto(URL, wait_until="networkidle")
+        box = page.locator("textarea").first
+        box.wait_for()
+        box.fill("warm-up message")           # warm-up request, before the part that is kept
+        page.get_by_role("button", name="Route message").click()
+        page.wait_for_timeout(3000)
+        page.reload(wait_until="networkidle")
         box = page.locator("textarea").first
         box.wait_for()
         page.wait_for_timeout(1500)
