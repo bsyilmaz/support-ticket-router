@@ -1,12 +1,12 @@
 {
-  "name": "YOUR NAME SURNAME",
-  "student_id": "YOUR STUDENT ID",
+  "name": "Bayram Selim Yılmaz",
+  "student_id": "2309011053",
   "repo_url": "https://github.com/bsyilmaz/support-ticket-router",
   "video_url": "https://youtu.be/<your-video-id>",
   "ai_usage": [
-    "Claude (Anthropic) – generated the first version of the code (preprocessing, models, training/evaluation script, Gradio app), the architecture-diagram and slide scripts, and drafted the slide text.",
-    "I reviewed and ran all code myself, trained every model in my own Google Colab session and took every number in this presentation from my own results.json.",
-    "I checked the architecture diagram against the code and can explain every component.",
-    "  Edit this slide if you used other tools (ChatGPT, Copilot, …) or changed parts yourself."
+    "Claude (Anthropic) – wrote the code (preprocessing, models, training/evaluation script, Gradio app), the architecture-diagram and slide scripts, drafted the slide text, and helped set up the GitHub repository and the Colab run.",
+    "Demo video: the screen capture was recorded with make_video.py (written with Claude), which types the inputs into the live application; the narration is my own voice.",
+    "Every model was trained in my own Google Colab session (T4 GPU); every number in this presentation is read from the results.json of that run.",
+    "I reviewed the code and the architecture diagram and can explain every component."
   ]
 }
